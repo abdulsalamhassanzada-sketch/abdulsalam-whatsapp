@@ -2,57 +2,428 @@
 <!DOCTYPE html>
 <html lang="ps" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Abdulsalam WhatsApp</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#f0f2f5;font-family:Arial,sans-serif;color:#222}
-header{background:#075e54;color:white;padding:20px;text-align:center}
-header h2{margin:0 0 8px}
-main{max-width:600px;margin:20px auto;padding:15px}
-.card{background:white;border-radius:14px;padding:20px;box-shadow:0 2px 8px #0001}
-input,textarea{width:100%;padding:13px;margin:8px 0;border:1px solid #ccc;border-radius:8px;font-size:16px}
-button{background:#128c7e;color:white;border:0;border-radius:8px;padding:12px 18px;font-size:16px;cursor:pointer}
-#messages{margin-top:15px}
-.msg{background:#dcf8c6;padding:12px;border-radius:10px;margin:8px 0;overflow-wrap:anywhere}
-small{color:#666}
-footer{text-align:center;padding:20px;color:#666}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#075e54">
+  <title>Abdulsalam WhatsApp</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #e9edef;
+      color: #202c33;
+    }
+    header {
+      background: #075e54;
+      color: white;
+      padding: 18px 14px;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 7px; font-size: 23px; }
+    header p { margin: 0; font-size: 14px; }
+    main { max-width: 650px; margin: 18px auto; padding: 0 12px; }
+    .panel {
+      background: white;
+      padding: 17px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 7px #0000000b;
+    }
+    h2 { font-size: 19px; margin: 0 0 14px; }
+    input, button, textarea {
+      font: inherit;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 5px 0;
+    }
+    input, textarea { border: 1px solid #ccd3d5; background: white; }
+    button {
+      border: 0;
+      background: #128c7e;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .55; }
+    .secondary { background: #e7f5f2; color: #075e54; }
+    .danger { background: #b42318; }
+    .hidden { display: none !important; }
+    #status { white-space: pre-wrap; font-size: 14px; line-height: 1.8; }
+    .user {
+      padding: 12px;
+      margin: 7px 0;
+      border: 1px solid #e2e8e9;
+      border-radius: 9px;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+    .user.active { background: #d9fdd3; border-color: #128c7e; }
+    .chatbox {
+      height: 300px;
+      overflow-y: auto;
+      padding: 10px;
+      background: #efeae2;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .bubble {
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 85%;
+      overflow-wrap: anywhere;
+      line-height: 1.6;
+      background: white;
+      align-self: flex-start;
+    }
+    .bubble.mine { background: #d9fdd3; align-self: flex-end; }
+    .bubble small { display: block; color: #667781; margin-top: 5px; }
+    .sendrow { display: flex; gap: 6px; align-items: center; }
+    .sendrow textarea { resize: vertical; min-height: 46px; margin-top: 8px; }
+    .sendrow button { width: 85px; flex-shrink: 0; }
+    footer { text-align: center; padding: 20px; color: #667781; font-size: 13px; }
+  </style>
 </head>
 <body>
 <header>
-<h2>Abdulsalam WhatsApp</h2>
-<div>ستاسو د خبرو اترو ساده اپلیکیشن</div>
+  <h1>💬 Abdulsalam WhatsApp</h1>
+  <p>ستاسو د خبرو اترو ساده اپلیکیشن</p>
 </header>
+
 <main>
-<div class="card">
-<h3>ښه راغلاست! 👋</h3>
-<p>خپل نوم ولیکئ او پیغام ولیږئ.</p>
-<input id="username" placeholder="ستاسو نوم">
-<textarea id="message" rows="3" placeholder="خپل پیغام ولیکئ..."></textarea>
-<button onclick="sendMessage()">پیغام اضافه کړه</button>
-<div id="messages"></div>
-</div>
+  <section class="panel" id="setup">
+    <h2>د اپلیکیشن نښلول</h2>
+    <p>د خپل Supabase پروژې معلومات ولیکئ.</p>
+    <input id="projectUrl" type="url" placeholder="Supabase Project URL">
+    <input id="publicKey" type="password" placeholder="Supabase Publishable Key">
+    <button id="connectBtn">له Supabase سره نښلول</button>
+    <p>یوازې Publishable key وکاروئ؛ Secret key مه داخلوئ.</p>
+  </section>
+
+  <section class="panel hidden" id="authPanel">
+    <h2>حساب جوړول یا ننوتل</h2>
+    <input id="username" maxlength="30" placeholder="ستاسو نوم">
+    <input id="email" type="email" placeholder="برېښنالیک">
+    <input id="password" type="password" minlength="6" placeholder="پټ نوم (لږ تر لږه ۶ توري)">
+    <button id="signupBtn">نوی حساب جوړ کړه</button>
+    <button id="loginBtn" class="secondary">خپل حساب ته ننوځه</button>
+  </section>
+
+  <section class="panel hidden" id="appPanel">
+    <p>ښه راغلاست، <strong id="myName"></strong> 👋</p>
+    <button id="logoutBtn" class="danger">له حسابه ووځه</button>
+    <h2>👥 کاروونکي</h2>
+    <p>د پیغام لېږلو لپاره یو کاروونکی وټاکئ.</p>
+    <button id="refreshBtn" class="secondary">د لېست تازه کول</button>
+    <div id="usersList"></div>
+  </section>
+
+  <section class="panel hidden" id="chatPanel">
+    <h2>💬 خبرې له <span id="peerName"></span> سره</h2>
+    <div id="messages" class="chatbox"></div>
+    <div class="sendrow">
+      <textarea id="messageText" maxlength="4000" placeholder="خپل پیغام ولیکئ..."></textarea>
+      <button id="sendBtn">ولېږه</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div id="status">د پیل لپاره خپل Supabase معلومات داخل کړئ.</div>
+  </section>
 </main>
-<footer>دا اپلیکیشن د عبدالسلام له خوا جوړ شوی دی.</footer>
-<script>
-function sendMessage(){
-const name=document.getElementById('username').value.trim();
-const text=document.getElementById('message').value.trim();
-if(!name||!text){alert('مهرباني وکړئ نوم او پیغام ولیکئ.');return;}
-const box=document.createElement('div');
-box.className='msg';
-const title=document.createElement('strong');
-title.textContent=name;
-const content=document.createElement('p');
-content.textContent=text;
-const time=document.createElement('small');
-time.textContent=new Date().toLocaleString();
-box.append(title,content,time);
-document.getElementById('messages').prepend(box);
-document.getElementById('message').value='';
+
+<footer>دا اپلیکیشن په افغانستان کې د عبدالسلام له خوا جوړ شوی دی.</footer>
+
+<script type="module">
+import { createClient } from
+  "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const $ = id => document.getElementById(id);
+let db = null;
+let currentUser = null;
+let currentProfile = null;
+let selectedUser = null;
+let messageChannel = null;
+let authReady = false;
+let busy = false;
+
+function status(text) { $("status").textContent = text; }
+function show(id, yes = true) {
+  $(id).classList.toggle("hidden", !yes);
 }
+function cleanName(s) { return s.trim().slice(0, 30); }
+
+function validConfig(url, key) {
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" &&
+      u.hostname.endsWith(".supabase.co") &&
+      key.startsWith("sb_publishable_");
+  } catch { return false; }
+}
+
+async function connect() {
+  const url = $("projectUrl").value.trim().replace(/\/+$/, "");
+  const key = $("publicKey").value.trim();
+
+  if (!validConfig(url, key)) {
+    status("د Supabase URL یا Publishable key سم نه دی. معلومات بیا وګورئ.");
+    return;
+  }
+
+  $("connectBtn").disabled = true;
+  try {
+    db = createClient(url, key);
+    authReady = true;
+    show("authPanel");
+    show("setup", false);
+    status("نښلول وشول. اوس حساب جوړ کړئ یا خپل حساب ته ننوځئ.");
+
+    const { data, error } = await db.auth.getSession();
+    if (error) throw error;
+    if (data.session) await loadMyAccount(data.session.user);
+  } catch (e) {
+    status("نښلول ناکام شول: " + e.message);
+  } finally {
+    $("connectBtn").disabled = false;
+  }
+}
+
+async function signup() {
+  if (!authReady || busy) return;
+  const name = cleanName($("username").value);
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if (!name || !email || password.length < 6) {
+    status("خپل نوم، سم برېښنالیک او لږ تر لږه ۶ توري پټ نوم ولیکئ.");
+    return;
+  }
+
+  busy = true;
+  try {
+    const { data, error } = await db.auth.signUp({
+      email, password,
+      options: { data: { username: name } }
+    });
+    if (error) throw error;
+
+    if (!data.session) {
+      status("حساب ثبت شو. که برېښنالیک تایید وغواړي، خپل ایمیل وګورئ؛ بیا ننوتل وکړئ.");
+      return;
+    }
+    await saveProfile(data.user, name);
+    await loadMyAccount(data.user);
+  } catch (e) {
+    status("حساب جوړ نه شو: " + e.message);
+  } finally { busy = false; }
+}
+
+async function login() {
+  if (!authReady || busy) return;
+  const email = $("email").value.trim();
+  const password = $("password").value;
+  if (!email || !password) {
+    status("برېښنالیک او پټ نوم ولیکئ.");
+    return;
+  }
+  busy = true;
+  try {
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    await loadMyAccount(data.user);
+  } catch (e) {
+    status("ننوتل ناکام شول: " + e.message);
+  } finally { busy = false; }
+}
+
+async function saveProfile(user, name) {
+  const { error } = await db.from("profiles").upsert({
+    id: user.id,
+    username: name
+  }, { onConflict: "id" });
+  if (error) throw error;
+}
+
+async function loadMyAccount(user) {
+  currentUser = user;
+  try {
+    const { data, error } = await db.from("profiles")
+      .select("id, username")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (error) throw error;
+
+    if (!data) {
+      const name = cleanName(user.user_metadata?.username || user.email.split("@")[0]);
+      await saveProfile(user, name);
+      currentProfile = { id: user.id, username: name };
+    } else currentProfile = data;
+
+    $("myName").textContent = currentProfile.username;
+    show("authPanel", false);
+    show("appPanel");
+    show("chatPanel", false);
+    status("حساب ته داخل شوئ. د خبرو لپاره یو کاروونکی وټاکئ.");
+    await loadUsers();
+  } catch (e) {
+    status("د پروفایل ستونزه: " + e.message +
+      "\nد profiles جدول او امنیتي پالیسۍ وګورئ.");
+  }
+}
+
+async function loadUsers() {
+  if (!currentUser) return;
+  const { data, error } = await db.from("profiles")
+    .select("id, username")
+    .neq("id", currentUser.id)
+    .order("username");
+
+  if (error) {
+    status("د کاروونکو لېست نه خلاصیږي: " + error.message);
+    return;
+  }
+
+  const list = $("usersList");
+  list.replaceChildren();
+
+  if (!data.length) {
+    list.textContent = "تر اوسه بل کاروونکی نشته. بل کس دې هم حساب جوړ کړي.";
+    return;
+  }
+
+  data.forEach(person => {
+    const item = document.createElement("div");
+    item.className = "user" +
+      (selectedUser?.id === person.id ? " active" : "");
+    item.textContent = "👤 " + person.username;
+    item.addEventListener("click", () => openChat(person));
+    list.appendChild(item);
+  });
+}
+
+async function openChat(person) {
+  selectedUser = person;
+  $("peerName").textContent = person.username;
+  show("chatPanel");
+  await loadUsers();
+  await loadMessages();
+
+  if (messageChannel) await db.removeChannel(messageChannel);
+  messageChannel = db.channel("chat-" + currentUser.id + "-" + person.id)
+    .on("postgres_changes", {
+      event: "INSERT",
+      schema: "public",
+      table: "messages"
+    }, payload => {
+      const m = payload.new;
+      const belongs =
+        (m.user_id === currentUser.id && m.receiver_id === person.id) ||
+        (m.user_id === person.id && m.receiver_id === currentUser.id);
+      if (belongs) loadMessages();
+    })
+    .subscribe();
+}
+
+async function loadMessages() {
+  if (!currentUser || !selectedUser) return;
+
+  const a = currentUser.id;
+  const b = selectedUser.id;
+  const filter = `and(user_id.eq.${a},receiver_id.eq.${b}),and(user_id.eq.${b},receiver_id.eq.${a})`;
+
+  const { data, error } = await db.from("messages")
+    .select("id,user_id,receiver_id,sender_name,message,created_at")
+    .or(filter)
+    .order("created_at", { ascending: true })
+    .limit(200);
+
+  if (error) {
+    status("پیغامونه نه خلاصیږي: " + error.message);
+    return;
+  }
+
+  const box = $("messages");
+  box.replaceChildren();
+
+  data.forEach(m => {
+    const bubble = document.createElement("div");
+    bubble.className = "bubble" +
+      (m.user_id === currentUser.id ? " mine" : "");
+
+    const body = document.createElement("div");
+    body.textContent = m.message;
+    bubble.appendChild(body);
+
+    const time = document.createElement("small");
+    time.textContent = new Date(m.created_at).toLocaleString();
+    bubble.appendChild(time);
+
+    box.appendChild(bubble);
+  });
+
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendMessage() {
+  if (!currentUser || !selectedUser || busy) {
+    status("لومړی یو کاروونکی وټاکئ.");
+    return;
+  }
+  const message = $("messageText").value.trim();
+  if (!message) return;
+
+  busy = true;
+  $("sendBtn").disabled = true;
+  try {
+    const { error } = await db.from("messages").insert({
+      user_id: currentUser.id,
+      receiver_id: selectedUser.id,
+      sender_name: currentProfile.username,
+      message
+    });
+    if (error) throw error;
+    $("messageText").value = "";
+    await loadMessages();
+  } catch (e) {
+    status("پیغام ونه لېږل شو: " + e.message);
+  } finally {
+    busy = false;
+    $("sendBtn").disabled = false;
+  }
+}
+
+async function logout() {
+  if (messageChannel) await db.removeChannel(messageChannel);
+  messageChannel = null;
+  const { error } = await db.auth.signOut();
+  if (error) status("له حسابه وتل ناکام شول: " + error.message);
+  currentUser = null;
+  currentProfile = null;
+  selectedUser = null;
+  show("appPanel", false);
+  show("chatPanel", false);
+  show("authPanel");
+  status("له حسابه ووتلئ. بېرته ننوتلای شئ.");
+}
+
+$("connectBtn").addEventListener("click", connect);
+$("signupBtn").addEventListener("click", signup);
+$("loginBtn").addEventListener("click", login);
+$("sendBtn").addEventListener("click", sendMessage);
+$("logoutBtn").addEventListener("click", logout);
+$("refreshBtn").addEventListener("click", loadUsers);
+$("messageText").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+db = null;
 </script>
 </body>
 </html>
