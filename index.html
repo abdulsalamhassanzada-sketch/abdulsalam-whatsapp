@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="ps" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abdulsalam WhatsApp</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f0f2f5;font-family:Arial,sans-serif;color:#222}
+header{background:#075e54;color:white;padding:20px;text-align:center}
+header h2{margin:0 0 8px}
+main{max-width:600px;margin:20px auto;padding:15px}
+.card{background:white;border-radius:14px;padding:20px;box-shadow:0 2px 8px #0001}
+input,textarea{width:100%;padding:13px;margin:8px 0;border:1px solid #ccc;border-radius:8px;font-size:16px}
+button{background:#128c7e;color:white;border:0;border-radius:8px;padding:12px 18px;font-size:16px;cursor:pointer}
+#messages{margin-top:15px}
+.msg{background:#dcf8c6;padding:12px;border-radius:10px;margin:8px 0;overflow-wrap:anywhere}
+small{color:#666}
+footer{text-align:center;padding:20px;color:#666}
+</style>
+</head>
+<body>
+<header>
+<h2>Abdulsalam WhatsApp</h2>
+<div>ستاسو د خبرو اترو ساده اپلیکیشن</div>
+</header>
+<main>
+<div class="card">
+<h3>ښه راغلاست! 👋</h3>
+<p>خپل نوم ولیکئ او پیغام ولیږئ.</p>
+<input id="username" placeholder="ستاسو نوم">
+<textarea id="message" rows="3" placeholder="خپل پیغام ولیکئ..."></textarea>
+<button onclick="sendMessage()">پیغام اضافه کړه</button>
+<div id="messages"></div>
+</div>
+</main>
+<footer>دا اپلیکیشن د عبدالسلام له خوا جوړ شوی دی.</footer>
+<script>
+function sendMessage(){
+const name=document.getElementById('username').value.trim();
+const text=document.getElementById('message').value.trim();
+if(!name||!text){alert('مهرباني وکړئ نوم او پیغام ولیکئ.');return;}
+const box=document.createElement('div');
+box.className='msg';
+const title=document.createElement('strong');
+title.textContent=name;
+const content=document.createElement('p');
+content.textContent=text;
+const time=document.createElement('small');
+time.textContent=new Date().toLocaleString();
+box.append(title,content,time);
+document.getElementById('messages').prepend(box);
+document.getElementById('message').value='';
+}
+</script>
+</body>
+</html>
